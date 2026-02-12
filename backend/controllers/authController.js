@@ -89,16 +89,16 @@ exports.adminLogin = async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
-    if (username !== 'Ritika' || password !== 'Ritika@11')
+    if (password !== 'capstone')
       return res.status(401).json({ success: false, error: 'Invalid admin credentials' });
 
-    let adminUser = await User.findOne({ role: 'admin', email: 'admin@wardwatch.com' }).select('+password');
-
+    let adminUser = await User.findOne({ role: 'admin', email: 'ak@gmail.com' }).select('+password');
+    // console.log(adminUser);
     if (!adminUser) {
-      const hashedPassword = await bcrypt.hash('Ritika@11', 10);
+      const hashedPassword = await bcrypt.hash('capstone', 10);
       adminUser = await User.create({
         name: 'Admin',
-        email: 'admin@wardwatch.com',
+        email: 'ak@gmail.com',
         password: hashedPassword,
         ward: 'Admin Ward',
         phone: '0000000000',
@@ -107,10 +107,12 @@ exports.adminLogin = async (req, res, next) => {
     }
 
     const isMatch = await bcrypt.compare(password, adminUser.password);
+    // console.log(isMatch);
     if (!isMatch)
       return res.status(401).json({ success: false, error: 'Invalid admin credentials' });
 
     const token = generateToken(adminUser._id);
+    console.log(token);
     res.status(200).json({
       success: true,
       token,
@@ -122,6 +124,7 @@ exports.adminLogin = async (req, res, next) => {
       },
     });
   } catch (error) {
+    // console.log(error);
     next(error);
   }
 };

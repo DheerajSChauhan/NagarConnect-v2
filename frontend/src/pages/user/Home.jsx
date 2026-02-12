@@ -168,10 +168,10 @@ const Home = () => {
         <div className="absolute inset-0 flex items-center justify-center text-center px-4">
           <div className="text-white max-w-4xl">
             <h1 className="text-4xl md:text-6xl font-bold mb-4 text-shadow-lg">
-              Together for a Cleaner Tomorrow
+              Together for a better Tomorrow
             </h1>
             <p className="text-xl md:text-2xl italic font-light">
-              "Keeping our surroundings clean is not an option - it's our responsibility"
+              "Turning citizen complaints into smart city solutions , one complaint at at time."
             </p>
           </div>
         </div>
@@ -194,8 +194,7 @@ const Home = () => {
                 <h3 className="text-xl font-bold text-gray-800">Our Mission</h3>
               </div>
               <p className="text-gray-600">
-                To empower communities to maintain clean, safe, and sustainable neighborhoods through collaborative
-                reporting, awareness, and civic engagement.
+                To develop an intelligent web platform that transforms civic complaint management through ML-powered priority detection, AI-driven solution recommendations, and real-time geospatial tracking.
               </p>
             </div>
 
@@ -207,14 +206,13 @@ const Home = () => {
                 <h3 className="text-xl font-bold text-gray-800">Our Vision</h3>
               </div>
               <p className="text-gray-600">
-                A world where every citizen actively participates in creating and maintaining pristine living
-                environments that foster health, happiness, and community pride.
+               To create a future where every civic complaint is intelligently prioritized and seamlessly resolved, fostering highly responsive, transparent, and efficient urban governance.
               </p>
             </div>
           </div>
 
           {/* Inspirational Quotes */}
-          <div className="bg-white p-8 rounded-xl shadow-lg space-y-6">
+          {/* <div className="bg-white p-8 rounded-xl shadow-lg space-y-6">
             {[
               {
                 quote: "We won't have a society if we destroy the environment.",
@@ -240,7 +238,7 @@ const Home = () => {
                 </p>
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
       </section>
 
@@ -252,18 +250,18 @@ const Home = () => {
             {[
               {
                 icon: <FaRecycle className="text-4xl mb-4" />,
-                title: "Sustainability",
-                desc: "Promoting eco-friendly solutions for long-term community health",
+                title: "Citizen centric",
+                desc: "Your voice, our first priority",
               },
               {
                 icon: <FaUsers className="text-4xl mb-4" />,
-                title: "Community",
-                desc: "Strengthening bonds through collective environmental action",
+                title: "intelligent action",
+                desc: "Smart data, faster solutions.",
               },
               {
                 icon: <FaHandsHelping className="text-4xl mb-4" />,
-                title: "Responsibility",
-                desc: "Encouraging personal accountability for shared spaces",
+                title: "transparent",
+                desc: "See your report solved, every step of the way",
               },
             ].map((val, idx) => (
               <div

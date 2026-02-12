@@ -57,7 +57,7 @@ const Signup = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden w-full max-w-md">
         <div className="bg-indigo-600 py-6 px-8 text-center">
-          <h1 className="text-3xl font-bold text-white">Join WardWatch</h1>
+          <h1 className="text-3xl font-bold text-white">Join Naggarconnect</h1>
           <p className="text-indigo-100 mt-2">Help improve your community</p>
         </div>
 

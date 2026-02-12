@@ -40,7 +40,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/home" className="flex-shrink-0">
-              <span className="text-xl font-bold text-green-600">WardWatch</span>
+              <span className="text-xl font-bold text-green-600">NaggarConnect</span>
             </Link>
           </div>
 
@@ -190,5 +190,6 @@ const Navbar = () => {
   )
 }
 
-export default Navbar
+export default Nav
+bar
 

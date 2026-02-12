@@ -1,6 +1,6 @@
 // Create main admin if not exists
-const mainAdminEmail = "mainadmin@nagarsaathi.com";
-const mainAdminPassword = "main@123";
+const mainAdminEmail = "jayadityamishra2004@gmail.com";
+const mainAdminPassword = "Jeemains@1";
 
 const mainAdmin = await User.findOne({ email: mainAdminEmail });
 
