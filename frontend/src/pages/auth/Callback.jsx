@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { supabase } from '../../config/supabase';
 import { API_BASE_URL } from '../../config/api';
 
@@ -30,13 +31,32 @@ const AuthCallback = () => {
 
         if (response.ok) {
           const userProfile = await response.json();
-          localStorage.setItem('user', JSON.stringify(userProfile.user));
+          if (userProfile?.user) {
+            localStorage.setItem('user', JSON.stringify(userProfile.user));
+          }
+        } else {
+          // Fallback to auth payload so UI can continue while backend profile is provisioned.
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            localStorage.setItem(
+              'user',
+              JSON.stringify({
+                id: user.id,
+                name: user.user_metadata?.name || user.user_metadata?.full_name || 'User',
+                email: user.email,
+                role: 'user',
+                ward: 'Not specified',
+              })
+            );
+          }
         }
 
         // Redirect to home
         navigate('/home');
       } catch (err) {
         setError(err.message);
+        toast.error('Google sign-in callback failed. Please try again.');
+        navigate('/login');
       }
     };
 

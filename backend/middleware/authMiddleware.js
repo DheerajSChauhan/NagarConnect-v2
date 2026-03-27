@@ -25,13 +25,46 @@ exports.protect = async (req, res, next) => {
       .eq("id", user.id)
       .maybeSingle();
 
-    if (error || !userProfile) {
-      return res.status(401).json({ message: "User profile not found" });
+    if (error) {
+      return res.status(401).json({ message: "User profile lookup failed" });
+    }
+
+    let effectiveProfile = userProfile;
+
+    // First OAuth login can have a valid auth user but no row in public.users yet.
+    if (!effectiveProfile) {
+      const fallbackName =
+        user.user_metadata?.name ||
+        user.user_metadata?.full_name ||
+        user.email?.split("@")[0] ||
+        "User";
+
+      const { data: createdProfile, error: createError } = await supabase
+        .from("users")
+        .upsert(
+          {
+            id: user.id,
+            name: fallbackName,
+            email: user.email,
+            role: "user",
+            ward: "Not specified",
+            phone: "Not specified",
+          },
+          { onConflict: "id" }
+        )
+        .select("id, name, email, role, ward")
+        .single();
+
+      if (createError || !createdProfile) {
+        return res.status(401).json({ message: "User profile not found" });
+      }
+
+      effectiveProfile = createdProfile;
     }
 
     req.user = {
-      ...userProfile,
-      _id: userProfile.id,
+      ...effectiveProfile,
+      _id: effectiveProfile.id,
       authUser: user,
     };
     next();
