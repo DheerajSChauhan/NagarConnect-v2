@@ -4,8 +4,7 @@ const {
   register,
   login,
   adminLogin,
-  googleLogin,
-  getMe,
+  getProfile,
   wardAdminLogin
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
@@ -52,8 +51,6 @@ router.post(
   wardAdminLogin
 );
 
-router.post('/google/login', googleLogin);
 
-router.get('/me', protect, getMe);
-
+router.get('/me', protect, getProfile);
 module.exports = router;

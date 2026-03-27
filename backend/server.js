@@ -7,13 +7,9 @@ const cookieParser = require("cookie-parser");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer"); // For file upload errors
-const connectDB = require("./config/db");
 
 // Load env vars
 dotenv.config({ path: "./.env" });
-
-// Connect to MongoDB
-connectDB();
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, "uploads", "complaints");
@@ -28,6 +24,11 @@ const discussionRoutes = require("./routes/discussionRoutes");
 
 // Initialize express app
 const app = express();
+
+const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 // Middleware: JSON and URL-encoded body parser
 app.use(express.json({ limit: "10mb" }));
@@ -47,10 +48,38 @@ if (process.env.NODE_ENV === "development") {
 // Middleware: Enable CORS
 app.use(
   cors({
-    origin: true,
+    origin: (origin, callback) => {
+      const isNagarConnectVercelOrigin =
+        typeof origin === "string" &&
+        /^https:\/\/nagar-connect-v2(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
+
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.length === 0 ||
+        allowedOrigins.includes(origin) ||
+        isNagarConnectVercelOrigin
+      ) {
+        return callback(null, true);
+      }
+      return callback(new Error("Origin not allowed by CORS"));
+    },
     credentials: true,
   })
 );
+
+// Root endpoint for quick deployment verification
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "NagarConnect backend is running",
+    health: "/api/health",
+  });
+});
+
+// Health check endpoint for hosting platform probes
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ success: true, status: "ok" });
+});
 
 // Mount route files
 app.use("/api/auth", authRoutes);

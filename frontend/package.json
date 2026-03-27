@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-icons/all-files": "^4.1.0",
     "@react-oauth/google": "^0.12.2",
+    "@supabase/supabase-js": "^2.100.1",
     "@tailwindcss/vite": "^4.1.8",
     "chart.js": "^4.4.9",
     "jwt-decode": "^4.0.0",

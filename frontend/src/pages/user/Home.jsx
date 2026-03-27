@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { GiTreeGrowth } from "react-icons/gi";
 import Navbar from "../../components/Navbar";
+import { API_BASE_URL } from "../../config/api";
 
 const Home = () => {
   const [user, setUser] = useState(null);
@@ -35,7 +36,7 @@ const Home = () => {
   const fetchUserStats = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/complaints/my", {
+      const response = await fetch(`${API_BASE_URL}/api/complaints/my`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

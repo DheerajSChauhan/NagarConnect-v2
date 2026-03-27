@@ -4,10 +4,15 @@
   "description": "Node.js backend for complaints platform",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "seed:admin": "node scripts/seedMainAdmin.js",
+    "seed:wards": "node scripts/seedWardAdmins.js",
+    "seed:all": "npm run seed:admin && npm run seed:wards"
   },
   "type": "commonjs",
   "dependencies": {
+    "@supabase/supabase-js": "^2.100.1",
     "bcryptjs": "^2.4.3",
     "colors": "^1.4.0",
     "cookie-parser": "^1.4.6",
@@ -16,9 +21,7 @@
     "express": "^4.18.2",
     "express-validator": "^7.0.1",
     "fs": "0.0.1-security",
-    "google-auth-library": "^9.0.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^7.6.0",
     "morgan": "^1.10.0",
     "multer": "^2.0.2",
     "path": "^0.12.7"

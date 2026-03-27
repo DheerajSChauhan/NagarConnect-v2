@@ -12,6 +12,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { API_BASE_URL } from "../../config/api";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
@@ -37,7 +38,7 @@ const WardAdminDashboard = () => {
   const fetchComplaints = async (ward) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/complaints/ward/${ward}`, {
+      const response = await fetch(`${API_BASE_URL}/api/complaints/ward/${ward}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -58,7 +59,7 @@ const WardAdminDashboard = () => {
   const handleStatusChange = async (id, newStatus) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/complaints/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/complaints/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

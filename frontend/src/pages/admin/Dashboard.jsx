@@ -24,8 +24,14 @@ import {
   YAxis,
   CartesianGrid,
 } from "recharts";
+import { API_BASE_URL } from "../../config/api";
 
 const COLORS = ["#FBBF24", "#3B82F6", "#10B981", "#EF4444"];
+
+const isAdminRole = (role) => {
+  const value = String(role || "").toLowerCase();
+  return ["admin", "mainadmin", "superadmin"].includes(value);
+};
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -50,7 +56,7 @@ const AdminDashboard = () => {
     if (userData) {
       const parsedUser = JSON.parse(userData);
       setUser(parsedUser);
-      if (parsedUser.role === "admin") {
+      if (isAdminRole(parsedUser.role)) {
         fetchComplaints();
       } else {
         navigate("/home");
@@ -63,7 +69,7 @@ const AdminDashboard = () => {
   const fetchComplaints = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/complaints", {
+      const response = await fetch(`${API_BASE_URL}/api/complaints`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -92,7 +98,7 @@ const AdminDashboard = () => {
   const handleStatusChange = async (id, newStatus) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/complaints/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/complaints/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

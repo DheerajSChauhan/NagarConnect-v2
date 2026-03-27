@@ -1,48 +1,49 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const User = require('../models/User'); // adjust path if needed
+const dotenv = require("dotenv");
+const bcrypt = require("bcryptjs");
 
-dotenv.config(); // Loads .env
+dotenv.config({ path: "./.env" });
 
-const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/wardwatch';
+const supabase = require("../config/supabase");
 
 const seedWardAdmins = async () => {
   try {
-    await mongoose.connect(MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
-    console.log('✅ MongoDB connected.');
-
     for (let i = 1; i <= 20; i++) {
       const email = `wardadmin${i}@nagarsaathi.com`;
       const plainPassword = `ward@${i}`;
       const wardNumber = `${i}`;
 
-      const existingUser = await User.findOne({ email });
+      const { data: existingUser, error: lookupError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("email", email)
+        .maybeSingle();
+
+      if (lookupError) throw lookupError;
+
       if (existingUser) {
-        console.log(`⚠️ Already exists: ${email}`);
+        console.log(`Already exists: ${email}`);
         continue;
       }
 
-      const newUser = new User({
+      const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
+      const { error: createError } = await supabase.from("users").insert({
         name: `Ward Admin ${i}`,
         email,
-        password: plainPassword, // password will be hashed by User model's pre-save
+        password: hashedPassword,
         ward: wardNumber,
-        phone: `99999999${String(i).padStart(2, '0')}`,
-        role: 'wardAdmin',
+        phone: `99999999${String(i).padStart(2, "0")}`,
+        role: "wardAdmin",
       });
 
-      await newUser.save();
-      console.log(`✅ Created: ${email} | Password: ${plainPassword}`);
+      if (createError) throw createError;
+      console.log(`Created: ${email} | Password: ${plainPassword}`);
     }
 
-    console.log('✅ Seeding complete');
+    console.log("Seeding complete");
     process.exit(0);
   } catch (error) {
-    console.error('❌ Seeding failed:', error.message);
+    console.error("Seeding ward admins failed:", error.message);
     process.exit(1);
   }
 };
