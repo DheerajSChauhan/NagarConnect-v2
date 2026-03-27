@@ -12,6 +12,11 @@ import WardAdminDashboard from "./pages/subAdmin/WardAdminDashboard";
 // Admin components
 import AdminDashboard from './pages/admin/Dashboard';
 
+const RootRedirect = () => {
+  const hasOAuthHash = window.location.hash.includes('access_token');
+  return <Navigate to={hasOAuthHash ? '/auth/callback' : '/login'} replace />;
+};
+
 function App() {
   return (
     <Router>
@@ -38,7 +43,7 @@ function App() {
           <Route path="/ward-dashboard" element={<WardAdminDashboard />} />
 
         {/* Redirects */}
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<RootRedirect />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </Router>

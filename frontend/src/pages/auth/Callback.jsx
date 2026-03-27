@@ -11,11 +11,32 @@ const AuthCallback = () => {
   useEffect (() => {
     const handleCallback = async () => {
       try {
-        // Get the session from Supabase after redirect
-        const { data: { session } } = await supabase.auth.getSession();
+        // Get the session from Supabase after redirect.
+        let { data: { session } } = await supabase.auth.getSession();
+
+        // If provider redirected to root with hash params, establish session explicitly.
+        if (!session && window.location.hash) {
+          const hashParams = new URLSearchParams(window.location.hash.substring(1));
+          const accessToken = hashParams.get('access_token');
+          const refreshToken = hashParams.get('refresh_token');
+
+          if (accessToken && refreshToken) {
+            const { data, error: setSessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+
+            if (setSessionError) {
+              throw new Error(setSessionError.message);
+            }
+
+            session = data.session;
+          }
+        }
 
         if (!session) {
-          throw new Error('No session found');
+          navigate('/login');
+          return;
         }
 
         // Store session info
@@ -52,6 +73,7 @@ const AuthCallback = () => {
         }
 
         // Redirect to home
+        window.history.replaceState({}, document.title, window.location.pathname);
         navigate('/home');
       } catch (err) {
         setError(err.message);
