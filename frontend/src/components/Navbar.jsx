@@ -190,6 +190,5 @@ const Navbar = () => {
   )
 }
 
-export default Nav
-bar
+export default Navbar
 
