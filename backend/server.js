@@ -59,6 +59,15 @@ app.use(
   })
 );
 
+// Root endpoint for quick deployment verification
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "NagarConnect backend is running",
+    health: "/api/health",
+  });
+});
+
 // Health check endpoint for hosting platform probes
 app.get("/api/health", (req, res) => {
   res.status(200).json({ success: true, status: "ok" });
