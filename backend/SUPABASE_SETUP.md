@@ -39,9 +39,19 @@
 
 - `npm start`
 
-## 7) Quick verification checklist
+## 7) Configure frontend environment
+
+- Copy `frontend/.env.example` to `frontend/.env`.
+- Set:
+  - `VITE_API_BASE_URL` (for local setup, use `http://localhost:5001`)
+  - `VITE_GOOGLE_CLIENT_ID`
+  - `VITE_SUPABASE_URL`
+  - `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+## 8) Quick verification checklist
 
 - Backend starts without `SUPABASE_URL` or key errors.
+- Frontend starts with `npm run dev` in `frontend` folder.
 - Register/Login works.
 - Complaint create/list works.
 - Discussion create/like works.
