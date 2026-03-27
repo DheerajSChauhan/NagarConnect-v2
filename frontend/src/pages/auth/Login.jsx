@@ -145,7 +145,7 @@ const Login = () => {
     }
   };
 
-  const usernameLabel = credentials.loginType === "user" ? "Email" : "Username";
+  const usernameLabel = credentials.loginType === "wardAdmin" ? "Ward Admin Email" : "Email";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -202,12 +202,12 @@ const Login = () => {
                   <FaUser className="text-gray-400" />
                 </div>
                 <input
-                  type={credentials.loginType === "user" ? "email" : "text"}
+                  type="email"
                   name="username"
                   value={credentials.username}
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder={credentials.loginType === "user" ? "you@example.com" : "Enter username"}
+                  placeholder="you@example.com"
                   required
                 />
               </div>

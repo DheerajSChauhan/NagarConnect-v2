@@ -49,8 +49,16 @@ if (process.env.NODE_ENV === "development") {
 app.use(
   cors({
     origin: (origin, callback) => {
+      const isNagarConnectVercelOrigin =
+        typeof origin === "string" &&
+        /^https:\/\/nagar-connect-v2(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
+
       if (!origin) return callback(null, true);
-      if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+      if (
+        allowedOrigins.length === 0 ||
+        allowedOrigins.includes(origin) ||
+        isNagarConnectVercelOrigin
+      ) {
         return callback(null, true);
       }
       return callback(new Error("Origin not allowed by CORS"));

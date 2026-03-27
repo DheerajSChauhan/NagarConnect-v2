@@ -134,11 +134,13 @@ exports.adminLogin = async (req, res, next) => {
       return res.status(400).json({ success: false, error: "Please provide username and password" });
     }
 
+    const email = String(username).trim().toLowerCase();
+
     const { data: adminUser, error } = await supabase
       .from("users")
       .select("id, name, email, role, ward, password")
-      .eq("role", "admin")
-      .eq("email", username)
+      .in("role", ["admin", "mainAdmin", "superadmin", "superAdmin"])
+      .eq("email", email)
       .maybeSingle();
 
     if (error) throw error;
@@ -172,12 +174,15 @@ exports.wardAdminLogin = async (req, res, next) => {
       });
     }
 
+    const email = String(username).trim().toLowerCase();
+    const ward = String(wardNumber).trim();
+
     const { data: wardAdmin, error } = await supabase
       .from("users")
       .select("id, name, email, role, ward, password")
-      .eq("role", "wardAdmin")
-      .eq("email", username)
-      .eq("ward", String(wardNumber))
+      .in("role", ["wardAdmin", "wardadmin", "ward_admin"])
+      .eq("email", email)
+      .eq("ward", ward)
       .maybeSingle();
 
     if (error) throw error;
