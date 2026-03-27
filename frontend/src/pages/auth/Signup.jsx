@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaLock, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
+import toast from 'react-hot-toast';
+import { supabase } from '../../config/supabase';
 import { API_BASE_URL } from '../../config/api';
 
 const Signup = () => {
@@ -26,21 +28,47 @@ const Signup = () => {
     setError('');
 
     try {
+      // Sign up with Supabase Auth
+      const { data, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            name: formData.name,
+            ward: formData.ward,
+            phone: formData.phone,
+          },
+        },
+      });
+
+      if (authError) throw new Error(authError.message);
+
+      if (!data.user) {
+        throw new Error('Signup failed. Please try again.');
+      }
+
+      // Create user profile in backend database
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          id: data.user.id,
+          name: formData.name,
+          email: formData.email,
+          ward: formData.ward,
+          phone: formData.phone,
+        }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || 'Signup failed');
+        console.warn('Profile creation failed, but Supabase account created');
       }
 
-      // Redirect to login with success message
+      toast.success('Signup successful! Please check your email to verify your account.');
+
+      // Redirect to login
       navigate('/login', {
         state: { 
           signupSuccess: true,
@@ -49,6 +77,7 @@ const Signup = () => {
       });
     } catch (err) {
       setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }

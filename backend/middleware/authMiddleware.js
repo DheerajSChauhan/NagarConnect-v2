@@ -1,5 +1,5 @@
-const jwt = require("jsonwebtoken");
 const supabase = require("../config/supabase");
+const supabaseClient = require("../config/supabaseClient");
 
 // Protect routes
 exports.protect = async (req, res, next) => {
@@ -8,21 +8,31 @@ exports.protect = async (req, res, next) => {
   if (!token) return res.status(401).json({ message: "Not authorized" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Verify Supabase token
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseClient.auth.getUser(token);
 
-    const { data: user, error } = await supabase
-      .from("users")
-      .select("id, name, email, role, ward")
-      .eq("id", decoded.id)
-      .maybeSingle();
-
-    if (error || !user) {
+    if (authError || !user) {
       return res.status(401).json({ message: "Token failed or expired" });
     }
 
+    // Fetch user profile from database
+    const { data: userProfile, error } = await supabase
+      .from("users")
+      .select("id, name, email, role, ward")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (error || !userProfile) {
+      return res.status(401).json({ message: "User profile not found" });
+    }
+
     req.user = {
-      ...user,
-      _id: user.id,
+      ...userProfile,
+      _id: userProfile.id,
+      authUser: user,
     };
     next();
   } catch (error) {
