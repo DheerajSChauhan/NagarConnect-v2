@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { FaUser, FaLock, FaHashtag } from "react-icons/fa";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
+import { API_BASE_URL } from "../../config/api";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
@@ -17,6 +18,8 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const showGoogleLogin = Boolean(googleClientId && googleClientId !== "YOUR_CLIENT_ID");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,7 +45,7 @@ const Login = () => {
       let response;
 
       if (credentials.loginType === "admin") {
-        response = await fetch("http://localhost:5000/api/auth/admin/login", {
+        response = await fetch(`${API_BASE_URL}/api/auth/admin/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -51,7 +54,7 @@ const Login = () => {
           }),
         });
       } else if (credentials.loginType === "wardAdmin") {
-        response = await fetch("http://localhost:5000/api/auth/wardadmin/login", {
+        response = await fetch(`${API_BASE_URL}/api/auth/wardadmin/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -61,7 +64,7 @@ const Login = () => {
           }),
         });
       } else {
-        response = await fetch("http://localhost:5000/api/auth/login", {
+        response = await fetch(`${API_BASE_URL}/api/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -93,7 +96,7 @@ const Login = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("http://localhost:5000/api/auth/google/login", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/google/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tokenId: credentialResponse.credential }),
@@ -227,7 +230,7 @@ const Login = () => {
             </button>
           </form>
 
-          {credentials.loginType === "user" && (
+          {credentials.loginType === "user" && showGoogleLogin && (
             <div className="my-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -239,7 +242,7 @@ const Login = () => {
               </div>
 
               <div className="mt-6 flex justify-center">
-                <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_CLIENT_ID"}>
+                <GoogleOAuthProvider clientId={googleClientId}>
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
                     onError={handleGoogleError}

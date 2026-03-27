@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import Navbar from "../../components/Navbar"
+import { API_BASE_URL } from "../../config/api"
 
 const statusStyles = {
   Pending: "bg-yellow-200 text-yellow-800",
@@ -31,7 +32,7 @@ const MyComplaints = () => {
   const fetchComplaints = async () => {
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch("http://localhost:5000/api/complaints/my", {
+      const response = await fetch(`${API_BASE_URL}/api/complaints/my`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -53,7 +54,7 @@ const MyComplaints = () => {
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch(`http://localhost:5000/api/complaints/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/complaints/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

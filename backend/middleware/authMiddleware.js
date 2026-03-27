@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const supabase = require("../config/supabase");
 
 // Protect routes
 exports.protect = async (req, res, next) => {
@@ -9,7 +9,21 @@ exports.protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select("-password");
+
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("id, name, email, role, ward")
+      .eq("id", decoded.id)
+      .maybeSingle();
+
+    if (error || !user) {
+      return res.status(401).json({ message: "Token failed or expired" });
+    }
+
+    req.user = {
+      ...user,
+      _id: user.id,
+    };
     next();
   } catch (error) {
     res.status(401).json({ message: "Token failed or expired" });

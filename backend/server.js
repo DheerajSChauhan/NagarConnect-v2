@@ -7,13 +7,9 @@ const cookieParser = require("cookie-parser");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer"); // For file upload errors
-const connectDB = require("./config/db");
 
 // Load env vars
 dotenv.config({ path: "./.env" });
-
-// Connect to MongoDB
-connectDB();
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, "uploads", "complaints");

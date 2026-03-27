@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import Navbar from "../../components/Navbar"
+import { API_BASE_URL } from "../../config/api"
 
 const ComplaintForm = () => {
   const [user, setUser] = useState(null)
@@ -82,7 +83,7 @@ const ComplaintForm = () => {
         submitData.append("image", formData.image)
       }
 
-      const response = await fetch("http://localhost:5000/api/complaints", {
+      const response = await fetch(`${API_BASE_URL}/api/complaints`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
