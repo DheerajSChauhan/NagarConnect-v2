@@ -25,6 +25,11 @@ const discussionRoutes = require("./routes/discussionRoutes");
 // Initialize express app
 const app = express();
 
+const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 // Middleware: JSON and URL-encoded body parser
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
@@ -43,10 +48,21 @@ if (process.env.NODE_ENV === "development") {
 // Middleware: Enable CORS
 app.use(
   cors({
-    origin: true,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Origin not allowed by CORS"));
+    },
     credentials: true,
   })
 );
+
+// Health check endpoint for hosting platform probes
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ success: true, status: "ok" });
+});
 
 // Mount route files
 app.use("/api/auth", authRoutes);
