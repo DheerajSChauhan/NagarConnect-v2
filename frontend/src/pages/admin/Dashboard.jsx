@@ -28,6 +28,11 @@ import { API_BASE_URL } from "../../config/api";
 
 const COLORS = ["#FBBF24", "#3B82F6", "#10B981", "#EF4444"];
 
+const isAdminRole = (role) => {
+  const value = String(role || "").toLowerCase();
+  return ["admin", "mainadmin", "superadmin"].includes(value);
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -51,7 +56,7 @@ const AdminDashboard = () => {
     if (userData) {
       const parsedUser = JSON.parse(userData);
       setUser(parsedUser);
-      if (parsedUser.role === "admin") {
+      if (isAdminRole(parsedUser.role)) {
         fetchComplaints();
       } else {
         navigate("/home");
