@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import Navbar from "../../components/Navbar"
 import { API_BASE_URL } from "../../config/api"
@@ -19,17 +19,16 @@ const MyComplaints = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const userData = localStorage.getItem("user")
-    if (userData) {
-      setUser(JSON.parse(userData))
-      fetchComplaints()
-    } else {
-      navigate("/login")
+  const getLocalComplaints = () => {
+    try {
+      const localList = JSON.parse(localStorage.getItem("localComplaints") || "[]")
+      return Array.isArray(localList) ? localList : []
+    } catch {
+      return []
     }
-  }, [navigate])
+  }
 
-  const fetchComplaints = async () => {
+  const fetchComplaints = useCallback(async () => {
     try {
       const token = localStorage.getItem("token")
       const response = await fetch(`${API_BASE_URL}/api/complaints/my`, {
@@ -40,18 +39,40 @@ const MyComplaints = () => {
 
       if (response.ok) {
         const data = await response.json()
-        setComplaints(data.complaints || [])
+        const merged = [...getLocalComplaints(), ...(data.complaints || [])]
+        setComplaints(merged)
       } else {
+        setComplaints(getLocalComplaints())
         console.error("Failed to fetch complaints")
       }
     } catch (error) {
+      setComplaints(getLocalComplaints())
       console.error("Error fetching complaints:", error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user")
+    if (userData) {
+      setUser(JSON.parse(userData))
+      fetchComplaints()
+    } else {
+      navigate("/login")
+    }
+  }, [fetchComplaints, navigate])
 
   const handleDelete = async (id) => {
+    if (String(id).startsWith("local-")) {
+      const updated = complaints.filter((complaint) => complaint._id !== id)
+      setComplaints(updated)
+      const localOnly = updated.filter((item) => String(item._id).startsWith("local-"))
+      localStorage.setItem("localComplaints", JSON.stringify(localOnly))
+      setShowDeleteConfirm(null)
+      return
+    }
+
     try {
       const token = localStorage.getItem("token")
       const response = await fetch(`${API_BASE_URL}/api/complaints/${id}`, {
@@ -116,7 +137,7 @@ const MyComplaints = () => {
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="text-gray-600">{user.ward}</span>
+              <span className="text-gray-600">{[user.locality, user.city, user.state].filter(Boolean).join(", ") || "Location not set"}</span>
             </div>
             <p className="text-sm text-gray-500 mt-1">{user.email}</p>
           </div>
@@ -199,7 +220,7 @@ const MyComplaints = () => {
                     </div>
                     <div className="flex justify-between text-sm text-gray-500 mt-1">
                       <span>Location: {complaint.location}</span>
-                      <span>Ward: {user.ward}</span>
+                      <span>City: {complaint.city || user.city || "N/A"}</span>
                     </div>
                     <p className="text-sm text-gray-400 mt-2">
                       Date Filed: {new Date(complaint.createdAt).toLocaleDateString()}

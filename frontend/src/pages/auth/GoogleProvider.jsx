@@ -1,8 +1,10 @@
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const GoogleProvider = ({ children }) => {
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
   return (
-    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+    <GoogleOAuthProvider clientId={googleClientId}>
       {children}
     </GoogleOAuthProvider>
   );

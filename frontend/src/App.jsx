@@ -1,51 +1,86 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import Callback from './pages/auth/Callback';
-import Login from './pages/auth/Login';
-import Signup from './pages/auth/Signup';
-import Feedback from './pages/user/Feedback';
-import ComplaintForm from './pages/user/ComplaintForm';
-import Home from './pages/user/Home';
-import Mycomplaint from './pages/user/MyComplaint';
-import DiscussionForum from './pages/user/DiscussionForum';
-import WardAdminDashboard from "./pages/subAdmin/WardAdminDashboard";
-// Admin components
-import AdminDashboard from './pages/admin/Dashboard';
+import { useEffect } from "react";
+import { BrowserRouter as Router, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import Home from "./pages/Home";
+import FileComplaint from "./pages/FileComplaint";
+import MyComplaints from "./pages/MyComplaints";
+import MapPage from "./pages/MapPage";
+import Forum from "./pages/Forum";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import AdminDashboard from "./pages/AdminDashboard";
+import OfficerDashboard from "./pages/WardDashboard";
+import Leaderboard from "./pages/WardLeaderboard";
+import LoginModal from "./components/LoginModal";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
+import { LanguageProvider } from "./context/LanguageContext";
 
-const RootRedirect = () => {
-  const hasOAuthHash = window.location.hash.includes('access_token');
-  return <Navigate to={hasOAuthHash ? '/auth/callback' : '/login'} replace />;
+const RouteController = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { openAuthModal } = useAuth();
+
+  useEffect(() => {
+    if (location.pathname === "/login") {
+      openAuthModal("login");
+      navigate("/", { replace: true });
+    }
+    if (location.pathname === "/signup") {
+      openAuthModal("signup");
+      navigate("/", { replace: true });
+    }
+  }, [location.pathname, navigate, openAuthModal]);
+
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/file-complaint" element={<FileComplaint />} />
+        <Route path="/my-complaints" element={<MyComplaints />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/map" element={<MapPage />} />
+        <Route path="/forum" element={<Forum />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
+
+        <Route
+          path="/admin"
+          element={(
+            <ProtectedRoute role={["admin", "super_admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/officer-dashboard"
+          element={(
+            <ProtectedRoute role={["city_officer", "district_officer", "state_officer", "dept_admin", "super_admin"]}>
+              <OfficerDashboard />
+            </ProtectedRoute>
+          )}
+        />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
+      <LoginModal />
+    </>
+  );
 };
 
 function App() {
   return (
     <Router>
-      {/* Toast notifications */}
-      <Toaster position="top-right" />
-      
-      {/* Main routes */}
-      <Routes>
-        {/* Auth routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/auth/callback" element={<Callback />} />
-
-        {/* User routes */}
-        <Route path="/feedback" element={<Feedback />} />
-        <Route path="/complaint" element={<ComplaintForm />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/mycomplaints" element={<Mycomplaint />} />
-        <Route path="/forum" element={<DiscussionForum />} />
-
-        {/* Admin routes - nested under AdminLayout */}
-        <Route path="/dashboard" element={<AdminDashboard />} />
-        
-          <Route path="/ward-dashboard" element={<WardAdminDashboard />} />
-
-        {/* Redirects */}
-        <Route path="/" element={<RootRedirect />} />
-        <Route path="*" element={<Navigate to="/login" />} />
-      </Routes>
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <Toaster position="top-right" />
+            <RouteController />
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </Router>
   );
 }

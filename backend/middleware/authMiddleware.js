@@ -4,15 +4,19 @@ const jwt = require("jsonwebtoken");
 
 const normalizeRole = (role) => {
   const value = String(role || "").trim().toLowerCase();
-  if (["admin", "mainadmin", "superadmin"].includes(value)) return "admin";
-  if (["wardadmin", "ward_admin"].includes(value)) return "wardAdmin";
+  if (["admin", "mainadmin"].includes(value)) return "admin";
+  if (["superadmin", "super_admin"].includes(value)) return "super_admin";
+  if (["deptadmin", "dept_admin", "department_admin"].includes(value)) return "dept_admin";
+  if (["stateofficer", "state_officer"].includes(value)) return "state_officer";
+  if (["districtofficer", "district_officer"].includes(value)) return "district_officer";
+  if (["cityofficer", "city_officer", "wardadmin", "ward_admin", "wardadmin"].includes(value)) return "city_officer";
   return value || "user";
 };
 
 const getProfileById = async (id) => {
   const { data: userProfile, error } = await supabase
     .from("users")
-    .select("id, name, email, role, ward")
+    .select("*")
     .eq("id", id)
     .maybeSingle();
 
@@ -37,7 +41,7 @@ exports.protect = async (req, res, next) => {
     if (!authError && user) {
       const { data: userProfile, error } = await supabase
         .from("users")
-        .select("id, name, email, role, ward")
+        .select("*")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -63,12 +67,16 @@ exports.protect = async (req, res, next) => {
               name: fallbackName,
               email: user.email,
               role: "user",
-              ward: "Not specified",
+              ward: "",
+              state: "",
+              district: "",
+              city: "",
+              locality: "",
               phone: "Not specified",
             },
             { onConflict: "id" }
           )
-          .select("id, name, email, role, ward")
+          .select("*")
           .single();
 
         if (createError || !createdProfile) {
@@ -87,7 +95,7 @@ exports.protect = async (req, res, next) => {
       return next();
     }
 
-    // Fallback for legacy JWTs used by admin and ward-admin login routes.
+    // Fallback for legacy JWTs used by admin and officer login routes.
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const profile = await getProfileById(decoded.id);
 

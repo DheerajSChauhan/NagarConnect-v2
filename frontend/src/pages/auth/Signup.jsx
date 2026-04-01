@@ -87,7 +87,7 @@ const Signup = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden w-full max-w-md">
         <div className="bg-indigo-600 py-6 px-8 text-center">
-          <h1 className="text-3xl font-bold text-white">Join Naggarconnect</h1>
+          <h1 className="text-3xl font-bold text-white">Join NagarConnect</h1>
           <p className="text-indigo-100 mt-2">Help improve your community</p>
         </div>
 
@@ -100,12 +100,13 @@ const Signup = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-gray-700 mb-2">Full Name</label>
+              <label htmlFor="name" className="block text-gray-700 mb-2">Full Name</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FaUser className="text-gray-400" />
                 </div>
                 <input
+                  id="name"
                   type="text"
                   name="name"
                   value={formData.name}
@@ -119,13 +120,12 @@ const Signup = () => {
             </div>
 
             <div>
-              <label className="block text-gray-700 mb-2">Email</label>
+              <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FaEnvelope className="text-gray-400" />
                 </div>
-                <input
-                  type="email"
+                <input                  id="email"                  type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
@@ -137,12 +137,13 @@ const Signup = () => {
             </div>
 
             <div>
-              <label className="block text-gray-700 mb-2">Password</label>
+              <label htmlFor="password" className="block text-gray-700 mb-2">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FaLock className="text-gray-400" />
                 </div>
                 <input
+                  id="password"
                   type="password"
                   name="password"
                   value={formData.password}
@@ -156,12 +157,13 @@ const Signup = () => {
             </div>
 
             <div>
-              <label className="block text-gray-700 mb-2">Ward Number</label>
+              <label htmlFor="ward" className="block text-gray-700 mb-2">Ward Number</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FaMapMarkerAlt className="text-gray-400" />
                 </div>
                 <select
+                  id="ward"
                   name="ward"
                   value={formData.ward}
                   onChange={handleChange}
@@ -177,12 +179,13 @@ const Signup = () => {
             </div>
 
             <div>
-              <label className="block text-gray-700 mb-2">Phone Number</label>
+              <label htmlFor="phone" className="block text-gray-700 mb-2">Phone Number</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FaPhone className="text-gray-400" />
                 </div>
                 <input
+                  id="phone"
                   type="tel"
                   name="phone"
                   value={formData.phone}

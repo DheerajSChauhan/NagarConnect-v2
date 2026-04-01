@@ -50,3 +50,5 @@ npm run seed:all
 
 - See `SUPABASE_SETUP.md` for backend Supabase setup details.
 - Uploads are stored under `uploads/complaints/`.
+- Profile verification uploads are stored under `uploads/id-proofs/`.
+- Run `scripts/profile_verification_schema.sql` in Supabase SQL Editor to enable government ID verification APIs.

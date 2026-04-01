@@ -4,7 +4,8 @@ const {
   createComplaint,
   getMyComplaints,
   getAllComplaints,
-  getComplaintsByWard,
+  getPublicComplaints,
+  getComplaintsByOfficerScope,
   updateComplaintStatus,
   deleteComplaint,
   uploadImage,
@@ -12,6 +13,8 @@ const {
 const { protect, authorize } = require("../middleware/authMiddleware")
 
 const router = express.Router()
+
+router.get("/public", getPublicComplaints)
 
 router.post(
   "/",
@@ -28,9 +31,9 @@ router.post(
 )
 
 router.get("/my", protect, getMyComplaints)
-router.get("/", protect, authorize("admin"), getAllComplaints)
-router.put("/:id", protect, authorize("admin","wardAdmin"), updateComplaintStatus)
+router.get("/scope", protect, getComplaintsByOfficerScope)
+router.get("/", protect, authorize("admin", "super_admin"), getAllComplaints)
+router.put("/:id", protect, authorize("admin", "super_admin", "dept_admin", "state_officer", "district_officer", "city_officer"), updateComplaintStatus)
 router.delete("/:id", protect, deleteComplaint) // Allow users to delete their own complaints
-router.get("/ward/:wardNumber", protect, getComplaintsByWard)
 module.exports = router
 

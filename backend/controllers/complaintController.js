@@ -28,28 +28,50 @@ const upload = multer({
 });
 
 const COMPLAINT_SELECT = `
-  id,
-  title,
-  ward,
-  description,
-  category,
-  location,
-  status,
-  priority,
-  image,
-  user_id,
-  created_at,
-  resolved_at,
-  user:users!complaints_user_id_fkey(id, name, email, ward)
+  *,
+  user:users!complaints_user_id_fkey(*)
 `;
+
+const normalizeText = (value, fallback = "") => {
+  const parsed = String(value ?? "").trim();
+  return parsed || fallback;
+};
+
+const inferUrbanBodyType = (value) => {
+  const parsed = normalizeText(value).toLowerCase();
+  const allowed = ["nagar_nigam", "nagar_palika", "nagar_panchayat", "gram_panchayat"];
+  if (allowed.includes(parsed)) {
+    return parsed;
+  }
+  return "nagar_nigam";
+};
+
+const inferDepartment = (category) => {
+  const value = normalizeText(category).toLowerCase();
+  if (["road", "pothole", "construction"].some((item) => value.includes(item))) return "Roads";
+  if (["water", "supply", "sewage", "drain"].some((item) => value.includes(item))) return "Water";
+  if (["sanitation", "garbage", "waste", "clean"].some((item) => value.includes(item))) return "Sanitation";
+  if (["light", "electric"].some((item) => value.includes(item))) return "Electricity";
+  return "Other";
+};
 
 const formatComplaint = (row) => ({
   _id: row.id,
   title: row.title,
-  ward: row.ward,
+  state: row.state || row.user?.state || "",
+  stateCode: row.state_code || "",
+  district: row.district || row.user?.district || "",
+  city: row.city || row.user?.city || "",
+  urbanBodyType: row.urban_body_type || "",
+  locality: row.locality || row.location || "",
+  latitude: row.latitude,
+  longitude: row.longitude,
+  assignedDepartment: row.assigned_department,
+  assignedOfficerId: row.assigned_officer_id,
+  ward: row.ward || row.user?.ward || null,
   description: row.description,
   category: row.category,
-  location: row.location,
+  location: row.location || [row.locality, row.city, row.district, row.state].filter(Boolean).join(", "),
   status: row.status,
   priority: row.priority,
   image: row.image,
@@ -58,7 +80,12 @@ const formatComplaint = (row) => ({
         _id: row.user.id,
         name: row.user.name,
         email: row.user.email,
-        ward: row.user.ward,
+        role: row.user.role,
+        state: row.user.state || "",
+        district: row.user.district || "",
+        city: row.user.city || "",
+        locality: row.user.locality || "",
+        ward: row.user.ward || null,
       }
     : row.user_id,
   createdAt: row.created_at,
@@ -76,28 +103,74 @@ exports.createComplaint = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { title, description, category, location, priority } = req.body;
+    const {
+      title,
+      description,
+      category,
+      location,
+      priority,
+      state,
+      stateCode,
+      district,
+      city,
+      urbanBodyType,
+      locality,
+      latitude,
+      longitude,
+    } = req.body;
 
-    const complaintData = {
+    const legacyComplaintData = {
       title,
       description,
       category,
       location,
       priority: priority || "Medium",
       user_id: req.user.id,
-      ward: req.user.ward,
+      ward: req.user.ward || null,
+    };
+
+    const complaintData = {
+      title,
+      description,
+      category,
+      location: normalizeText(location, [locality, city, district, state].filter(Boolean).join(", ")),
+      priority: priority || "Medium",
+      user_id: req.user.id,
+      state: normalizeText(state, req.user.state || ""),
+      state_code: normalizeText(stateCode),
+      district: normalizeText(district, req.user.district || ""),
+      city: normalizeText(city, req.user.city || ""),
+      urban_body_type: inferUrbanBodyType(urbanBodyType),
+      locality: normalizeText(locality),
+      latitude: latitude !== undefined && latitude !== null && String(latitude).trim() !== "" ? Number(latitude) : null,
+      longitude: longitude !== undefined && longitude !== null && String(longitude).trim() !== "" ? Number(longitude) : null,
+      assigned_department: inferDepartment(category),
+      assigned_officer_id: null,
+      ward: req.user.ward || null,
     };
 
     // Add image path if file was uploaded
     if (req.file) {
       complaintData.image = req.file.path;
+      legacyComplaintData.image = req.file.path;
     }
 
-    const { data: complaint, error } = await supabase
-      .from("complaints")
-      .insert(complaintData)
-      .select(COMPLAINT_SELECT)
-      .single();
+    let complaint = null;
+    let error = null;
+
+    const extendedInsert = await supabase.from("complaints").insert(complaintData).select(COMPLAINT_SELECT).single();
+    complaint = extendedInsert.data;
+    error = extendedInsert.error;
+
+    if (error && /column/i.test(String(error.message || ""))) {
+      const legacyInsert = await supabase
+        .from("complaints")
+        .insert(legacyComplaintData)
+        .select(COMPLAINT_SELECT)
+        .single();
+      complaint = legacyInsert.data;
+      error = legacyInsert.error;
+    }
 
     if (error) throw error;
 
@@ -193,6 +266,71 @@ exports.getAllComplaints = async (req, res) => {
       .from("complaints")
       .select(COMPLAINT_SELECT)
       .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    const formatted = (complaints || []).map(formatComplaint);
+
+    res.status(200).json({
+      success: true,
+      count: formatted.length,
+      complaints: formatted,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Get complaints in officer scope
+// @route   GET /api/complaints/scope
+// @access  Private
+exports.getComplaintsByOfficerScope = async (req, res) => {
+  try {
+    const role = String(req.user.role || "").toLowerCase();
+
+    let query = supabase.from("complaints").select(COMPLAINT_SELECT).order("created_at", { ascending: false });
+
+    if (role === "city_officer") {
+      query = query.eq("city", req.user.city || "");
+    } else if (role === "district_officer") {
+      query = query.eq("district", req.user.district || "");
+    } else if (role === "state_officer") {
+      query = query.eq("state", req.user.state || "");
+    } else if (!["super_admin", "admin"].includes(role)) {
+      query = query.eq("user_id", req.user.id);
+    }
+
+    const { data: complaints, error } = await query;
+    if (error) throw error;
+
+    const formatted = (complaints || []).map(formatComplaint);
+
+    res.status(200).json({
+      success: true,
+      count: formatted.length,
+      complaints: formatted,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Get public complaints for map
+// @route   GET /api/complaints/public
+// @access  Public
+exports.getPublicComplaints = async (req, res) => {
+  try {
+    const { data: complaints, error } = await supabase
+      .from("complaints")
+      .select(COMPLAINT_SELECT)
+      .order("created_at", { ascending: false })
+      .limit(300);
 
     if (error) throw error;
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { supabase } from '../../config/supabase';
 import { API_BASE_URL } from '../../config/api';
+import AshokaSpinner from '../../components/AshokaSpinner';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -86,9 +87,10 @@ const AuthCallback = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-indigo-50">
+    <div className="min-h-screen flex items-center justify-center bg-[linear-gradient(135deg,#f8efe2_0%,#f5e4d0_100%)]">
       <div className="text-center">
-        <h2 className="text-2xl font-bold mb-4">Loading...</h2>
+        <AshokaSpinner messageIndex={2} size={56} className="mb-4" />
+        <h2 className="font-heading text-2xl font-bold mb-2">Signing you in...</h2>
         {error && <p className="text-red-600">{error}</p>}
       </div>
     </div>

@@ -17,6 +17,11 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+const idProofUploadsDir = path.join(__dirname, "uploads", "id-proofs");
+if (!fs.existsSync(idProofUploadsDir)) {
+  fs.mkdirSync(idProofUploadsDir, { recursive: true });
+}
+
 // Import route files
 const authRoutes = require("./routes/authRoutes");
 const complaintRoutes = require("./routes/complaintRoutes");

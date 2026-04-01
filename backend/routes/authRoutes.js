@@ -5,7 +5,11 @@ const {
   login,
   adminLogin,
   getProfile,
-  wardAdminLogin
+  officerLogin,
+  updateProfile,
+  getVerification,
+  submitVerification,
+  uploadIdProof,
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -17,7 +21,9 @@ router.post(
     check('name', 'Name is required').not().isEmpty(),
     check('email', 'Please include a valid email').isEmail(),
     check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
-    check('ward', 'Ward is required').not().isEmpty(),
+    check('state', 'State is required').not().isEmpty(),
+    check('district', 'District is required').not().isEmpty(),
+    check('city', 'City is required').not().isEmpty(),
     check('phone', 'Phone number is required').not().isEmpty()
   ],
   register
@@ -42,15 +48,18 @@ router.post(
 );
 
 router.post(
-  '/wardadmin/login',
+  '/officer/login',
   [
     check('username', 'Username is required').not().isEmpty(),
     check('password', 'Password is required').not().isEmpty(),
-    check('wardNumber', 'Ward number is required').not().isEmpty()
+    check('role', 'Officer role is required').not().isEmpty(),
   ],
-  wardAdminLogin
+  officerLogin
 );
 
 
 router.get('/me', protect, getProfile);
+router.put('/profile', protect, updateProfile);
+router.get('/verification', protect, getVerification);
+router.post('/verification', protect, uploadIdProof, submitVerification);
 module.exports = router;

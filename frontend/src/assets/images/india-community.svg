@@ -1,0 +1,60 @@
+<svg width="1200" height="600" viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="600" y1="0" x2="600" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF9933"/>
+      <stop offset="0.5" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#138808"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="460" x2="1200" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#244B2C"/>
+      <stop offset="1" stop-color="#16361E"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <path d="M0 470C140 430 260 520 410 490C560 460 670 390 820 430C960 468 1060 535 1200 500V600H0V470Z" fill="url(#ground)"/>
+
+  <g fill="#1F2937" opacity="0.9">
+    <circle cx="180" cy="430" r="28"/>
+    <rect x="155" y="455" width="50" height="80" rx="18"/>
+
+    <circle cx="280" cy="420" r="24"/>
+    <rect x="258" y="442" width="44" height="92" rx="16"/>
+
+    <circle cx="370" cy="432" r="30"/>
+    <rect x="342" y="460" width="56" height="78" rx="18"/>
+
+    <circle cx="820" cy="425" r="26"/>
+    <rect x="796" y="450" width="48" height="84" rx="16"/>
+
+    <circle cx="920" cy="420" r="24"/>
+    <rect x="898" y="444" width="44" height="90" rx="16"/>
+
+    <circle cx="1010" cy="432" r="30"/>
+    <rect x="982" y="460" width="56" height="78" rx="18"/>
+  </g>
+
+  <g transform="translate(600 250)">
+    <circle r="68" fill="#FFFFFF" fill-opacity="0.72"/>
+    <circle r="60" stroke="#000080" stroke-opacity="0.35" stroke-width="6" fill="none"/>
+    <g stroke="#000080" stroke-opacity="0.45" stroke-width="2.5">
+      <line x1="0" y1="-54" x2="0" y2="54"/>
+      <line x1="-54" y1="0" x2="54" y2="0"/>
+      <line x1="-38" y1="-38" x2="38" y2="38"/>
+      <line x1="-38" y1="38" x2="38" y2="-38"/>
+      <line x1="-20" y1="-50" x2="20" y2="50"/>
+      <line x1="20" y1="-50" x2="-20" y2="50"/>
+      <line x1="-50" y1="-20" x2="50" y2="20"/>
+      <line x1="-50" y1="20" x2="50" y2="-20"/>
+    </g>
+  </g>
+
+  <g fill="#0A2342" opacity="0.18">
+    <rect x="70" y="280" width="80" height="150"/>
+    <rect x="130" y="250" width="100" height="180"/>
+    <rect x="215" y="300" width="70" height="130"/>
+    <rect x="890" y="290" width="90" height="140"/>
+    <rect x="960" y="260" width="110" height="170"/>
+    <rect x="1055" y="310" width="75" height="120"/>
+  </g>
+</svg>

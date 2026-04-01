@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FaQuoteLeft,
   FaHandsHelping,
   FaRecycle,
   FaUsers,
@@ -22,6 +21,7 @@ const Home = () => {
   });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const isAuthenticated = Boolean(user);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -29,9 +29,9 @@ const Home = () => {
       setUser(JSON.parse(userData));
       fetchUserStats();
     } else {
-      navigate("/login");
+      setLoading(false);
     }
-  }, [navigate]);
+  }, []);
 
   const fetchUserStats = async () => {
     try {
@@ -60,7 +60,67 @@ const Home = () => {
     }
   };
 
-  if (!user) return <div>Loading...</div>;
+  if (loading && isAuthenticated) {
+    return <div className="min-h-screen grid place-items-center text-gray-600">Loading...</div>;
+  }
+
+  const getComplaintStatusClass = (status) => {
+    if (status === "Resolved") return "bg-green-100 text-green-800";
+    if (status === "In Progress") return "bg-blue-100 text-blue-800";
+    if (status === "Pending") return "bg-yellow-100 text-yellow-800";
+    return "bg-red-100 text-red-800";
+  };
+
+  const getStatLabel = (value) => {
+    if (!isAuthenticated) return "Login required";
+    if (loading) return "...";
+    return value;
+  };
+
+  let recentComplaintsContent;
+  if (loading) {
+    recentComplaintsContent = <p className="text-gray-500">Loading...</p>;
+  } else if (!isAuthenticated) {
+    recentComplaintsContent = (
+      <div className="rounded-lg border border-dashed border-emerald-300 bg-emerald-50 p-4 text-center">
+        <p className="text-sm text-emerald-800 mb-3">Login to view your complaints, status updates, and activity history.</p>
+        <button
+          type="button"
+          onClick={() => navigate("/login")}
+          className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+        >
+          Login to Continue
+        </button>
+      </div>
+    );
+  } else if (stats.recentComplaints.length === 0) {
+    recentComplaintsContent = <p className="text-gray-500">No complaints filed yet. Start by filing your first complaint!</p>;
+  } else {
+    recentComplaintsContent = (
+      <div className="space-y-3">
+        {stats.recentComplaints.map((complaint) => (
+          <div
+            key={complaint._id}
+            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+          >
+            <div>
+              <p className="font-medium text-gray-800">{complaint.title}</p>
+              <p className="text-sm text-gray-600">
+                {complaint.category} • {complaint.location}
+              </p>
+            </div>
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getComplaintStatusClass(complaint.status)}`}>
+              {complaint.status}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  const totalComplaintsLabel = getStatLabel(stats.totalComplaints);
+  const resolvedComplaintsLabel = getStatLabel(stats.resolvedComplaints);
+  const pendingComplaintsLabel = getStatLabel(stats.pendingComplaints);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
@@ -73,15 +133,17 @@ const Home = () => {
             <div className="flex items-center space-x-4">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                 <span className="text-green-600 font-bold text-2xl">
-                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                  {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
                 </span>
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-800">
-                  Welcome back, {user.name}!
+                  {isAuthenticated ? `Welcome back, ${user.name}!` : "Welcome to NagarConnect"}
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  {user.ward} • Making your community better together
+                  {isAuthenticated
+                    ? `${user.ward} • Making your community better together`
+                    : "Explore the platform first. Login to file and track complaints."}
                 </p>
               </div>
             </div>
@@ -93,7 +155,7 @@ const Home = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Total Complaints</p>
-                  <p className="text-2xl font-bold text-blue-600">{loading ? "..." : stats.totalComplaints}</p>
+                  <p className="text-2xl font-bold text-blue-600">{totalComplaintsLabel}</p>
                 </div>
                 <FaChartLine className="h-8 w-8 text-blue-500" />
               </div>
@@ -102,7 +164,7 @@ const Home = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Resolved</p>
-                  <p className="text-2xl font-bold text-green-600">{loading ? "..." : stats.resolvedComplaints}</p>
+                  <p className="text-2xl font-bold text-green-600">{resolvedComplaintsLabel}</p>
                 </div>
                 <FaUsers className="h-8 w-8 text-green-500" />
               </div>
@@ -111,7 +173,7 @@ const Home = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Pending</p>
-                  <p className="text-2xl font-bold text-yellow-600">{loading ? "..." : stats.pendingComplaints}</p>
+                  <p className="text-2xl font-bold text-yellow-600">{pendingComplaintsLabel}</p>
                 </div>
                 <FaExclamationTriangle className="h-8 w-8 text-yellow-500" />
               </div>
@@ -121,40 +183,7 @@ const Home = () => {
           {/* Recent Complaints */}
           <div className="bg-white rounded-xl shadow-md p-6 mb-8">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Complaints</h3>
-            {loading ? (
-              <p className="text-gray-500">Loading...</p>
-            ) : stats.recentComplaints.length === 0 ? (
-              <p className="text-gray-500">No complaints filed yet. Start by filing your first complaint!</p>
-            ) : (
-              <div className="space-y-3">
-                {stats.recentComplaints.map((complaint) => (
-                  <div
-                    key={complaint._id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div>
-                      <p className="font-medium text-gray-800">{complaint.title}</p>
-                      <p className="text-sm text-gray-600">
-                        {complaint.category} • {complaint.location}
-                      </p>
-                    </div>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        complaint.status === "Resolved"
-                          ? "bg-green-100 text-green-800"
-                          : complaint.status === "In Progress"
-                          ? "bg-blue-100 text-blue-800"
-                          : complaint.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {complaint.status}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+            {recentComplaintsContent}
           </div>
         </div>
       </section>
@@ -264,9 +293,9 @@ const Home = () => {
                 title: "transparent",
                 desc: "See your report solved, every step of the way",
               },
-            ].map((val, idx) => (
+            ].map((val) => (
               <div
-                key={idx}
+                key={val.title}
                 className="text-center p-6 bg-blue-700 rounded-xl hover:bg-blue-800 transition-colors"
               >
                 <div className="flex justify-center">{val.icon}</div>
@@ -285,8 +314,12 @@ const Home = () => {
           <p className="text-gray-600 mb-6">
             Be part of the solution! Report issues in your neighborhood and help us create cleaner, safer communities.
           </p>
-          <button className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-3 rounded-full font-bold hover:opacity-90 transition-opacity">
-            Get Started Today
+          <button
+            type="button"
+            onClick={() => navigate(isAuthenticated ? "/complaint" : "/login")}
+            className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-3 rounded-full font-bold hover:opacity-90 transition-opacity"
+          >
+            {isAuthenticated ? "File a Complaint" : "Login to Get Started"}
           </button>
         </div>
       </section>

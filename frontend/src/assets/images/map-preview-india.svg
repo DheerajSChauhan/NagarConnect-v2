@@ -1,0 +1,18 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <rect width="1200" height="700" fill="#E8E0D2"/>
+  <path d="M0 520C200 460 340 560 520 520C680 485 820 550 1000 510C1080 492 1140 500 1200 520V700H0V520Z" fill="#C9D7C4"/>
+  <path d="M70 140C260 80 430 200 620 130C760 80 930 210 1120 150" stroke="#A0B89B" stroke-width="28" stroke-linecap="round"/>
+  <path d="M120 270C280 220 430 330 620 280C790 230 930 340 1080 290" stroke="#95A9C8" stroke-width="24" stroke-linecap="round"/>
+  <path d="M120 420C300 360 470 470 660 410C820 360 980 470 1080 430" stroke="#B89E7F" stroke-width="26" stroke-linecap="round"/>
+  <g>
+    <circle cx="320" cy="246" r="22" fill="#C62828"/>
+    <circle cx="630" cy="178" r="22" fill="#E65100"/>
+    <circle cx="910" cy="296" r="22" fill="#2E7D32"/>
+    <circle cx="520" cy="394" r="22" fill="#C62828"/>
+    <circle cx="780" cy="440" r="22" fill="#E65100"/>
+  </g>
+  <rect x="24" y="24" width="250" height="128" rx="12" fill="#FFFDF7" stroke="#D7BEA2"/>
+  <text x="44" y="58" fill="#1C1008" font-size="30" font-family="Rajdhani">Apna Sheher Dekho</text>
+  <text x="44" y="88" fill="#7A6652" font-size="18" font-family="Noto Sans">Bhopal Ward Map Preview</text>
+  <text x="44" y="118" fill="#1A6B3C" font-size="16" font-family="Noto Sans">Red: Urgent  Orange: Medium  Green: Low</text>
+</svg>

@@ -1,0 +1,13 @@
+<svg width="800" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <rect width="800" height="500" fill="#DCC8B2"/>
+  <rect y="360" width="800" height="140" fill="#9A7B5F"/>
+  <rect x="80" y="150" width="220" height="210" fill="#A67B5B"/>
+  <rect x="330" y="120" width="260" height="240" fill="#8D6A52"/>
+  <rect x="620" y="180" width="120" height="180" fill="#A67B5B"/>
+  <path d="M140 210H240M140 250H240M140 290H240" stroke="#DCC8B2" stroke-width="10"/>
+  <path d="M380 180H540M380 220H540M380 260H540M380 300H540" stroke="#C8AD93" stroke-width="12"/>
+  <rect x="560" y="70" width="24" height="230" fill="#1C1008"/>
+  <path d="M572 70L670 100V132L572 106V70Z" fill="#FF8C00"/>
+  <rect x="500" y="330" width="200" height="30" fill="#C62828"/>
+  <text x="512" y="351" fill="#FFFDF7" font-size="20" font-family="Noto Sans">ENCROACHMENT</text>
+</svg>

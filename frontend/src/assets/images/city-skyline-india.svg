@@ -1,0 +1,13 @@
+<svg width="780" height="280" viewBox="0 0 780 280" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <path d="M0 250H780" stroke="#FFFFFF" stroke-opacity="0.7"/>
+  <path d="M16 250V198H58V250M74 250V178H96V146H128V250M146 250V164H192V250M214 250V188H252V250M268 250V172H304V250M326 250V152H362V250M382 250V134H412V250M428 250V172H464V250M488 250V152H514V122H536V152H560V250M582 250V188H622V250M642 250V166H680V250M700 250V190H742V250" fill="#FFFFFF" fill-opacity="0.35"/>
+  <path d="M530 250V92L545 76L560 92V250" fill="#FFFFFF" fill-opacity="0.82"/>
+  <path d="M392 250V84L408 70L424 84V250" fill="#FFFFFF" fill-opacity="0.75"/>
+  <path d="M112 250V72H140V250" fill="#FFFFFF" fill-opacity="0.7"/>
+  <path d="M96 72H156" stroke="#FFFFFF" stroke-opacity="0.8"/>
+  <path d="M102 64C111 54 141 54 150 64" stroke="#FFFFFF" stroke-opacity="0.8"/>
+  <path d="M32 218H52M32 208H52M32 198H52" stroke="#FFFFFF" stroke-opacity="0.65"/>
+  <path d="M420 110C460 90 500 90 540 110" stroke="#FFB347" stroke-width="2" stroke-dasharray="4 6"/>
+  <path d="M547 79L562 74" stroke="#FFB347" stroke-width="2"/>
+  <path d="M530 108H560" stroke="#FFFFFF" stroke-opacity="0.7"/>
+</svg>

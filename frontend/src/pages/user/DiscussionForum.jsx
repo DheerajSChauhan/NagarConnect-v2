@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Navbar from './Navbar';
+import Navbar from '../../components/Navbar';
 import { FaUser, FaPaperPlane, FaThumbsUp, FaComment, FaTrash, FaGlobe } from 'react-icons/fa';
 
 const DiscussionForum = () => {
@@ -102,14 +102,14 @@ const DiscussionForum = () => {
 
   // Delete a post (only for author)
   const handleDeletePost = (postId) => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
+    if (globalThis.confirm("Are you sure you want to delete this post?")) {
       setPosts(posts.filter(post => post.id !== postId));
     }
   };
 
   // Delete a comment (only for author)
   const handleDeleteComment = (postId, commentId) => {
-    if (window.confirm("Are you sure you want to delete this comment?")) {
+    if (globalThis.confirm("Are you sure you want to delete this comment?")) {
       setPosts(posts.map(post => {
         if (post.id === postId) {
           return {

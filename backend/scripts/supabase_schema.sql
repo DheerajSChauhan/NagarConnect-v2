@@ -6,9 +6,15 @@ create table if not exists public.users (
   name text not null,
   email text not null unique,
   password text,
-  ward text not null,
+  state text,
+  district text,
+  city text,
+  locality text,
+  department text,
+  employee_id text,
+  ward text,
   phone text not null,
-  role text not null default 'user',
+  role text not null default 'citizen',
   google_id text unique,
   created_at timestamptz not null default now()
 );
@@ -16,7 +22,17 @@ create table if not exists public.users (
 create table if not exists public.complaints (
   id uuid primary key default gen_random_uuid(),
   title text not null,
-  ward text not null,
+  state text,
+  state_code text,
+  district text,
+  city text,
+  urban_body_type text check (urban_body_type in ('nagar_nigam', 'nagar_palika', 'nagar_panchayat', 'gram_panchayat')),
+  locality text,
+  latitude double precision,
+  longitude double precision,
+  assigned_department text,
+  assigned_officer_id uuid references public.users(id),
+  ward text,
   description text not null,
   category text not null,
   location text not null,
@@ -44,6 +60,9 @@ create table if not exists public.discussion_likes (
 );
 
 create index if not exists idx_complaints_user_id on public.complaints(user_id);
+create index if not exists idx_complaints_state on public.complaints(state);
+create index if not exists idx_complaints_district on public.complaints(district);
+create index if not exists idx_complaints_city on public.complaints(city);
 create index if not exists idx_complaints_created_at on public.complaints(created_at desc);
 create index if not exists idx_discussions_user_id on public.discussions(user_id);
 create index if not exists idx_discussions_created_at on public.discussions(created_at desc);

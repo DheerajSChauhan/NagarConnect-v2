@@ -110,7 +110,7 @@ const AdminDashboard = () => {
       if (response.ok) {
         fetchComplaints();
       }
-    } catch (err) {
+    } catch {
       alert("Error updating status");
     }
   };
@@ -202,6 +202,7 @@ const AdminDashboard = () => {
     return matchesSearch && matchesStatus && matchesCategory && matchesWard;
   });
 
+  if (loading) return <div>Loading...</div>;
   if (!user) return <div>Loading...</div>;
 
   return (
