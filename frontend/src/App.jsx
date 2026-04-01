@@ -13,6 +13,7 @@ import OfficerDashboard from "./pages/WardDashboard";
 import Leaderboard from "./pages/WardLeaderboard";
 import LoginModal from "./components/LoginModal";
 import ProtectedRoute from "./components/ProtectedRoute";
+import GoogleProvider from "./pages/auth/GoogleProvider";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
@@ -72,16 +73,18 @@ const RouteController = () => {
 
 function App() {
   return (
-    <Router>
-      <ThemeProvider>
-        <LanguageProvider>
-          <AuthProvider>
-            <Toaster position="top-right" />
-            <RouteController />
-          </AuthProvider>
-        </LanguageProvider>
-      </ThemeProvider>
-    </Router>
+    <GoogleProvider>
+      <Router>
+        <ThemeProvider>
+          <LanguageProvider>
+            <AuthProvider>
+              <Toaster position="top-right" />
+              <RouteController />
+            </AuthProvider>
+          </LanguageProvider>
+        </ThemeProvider>
+      </Router>
+    </GoogleProvider>
   );
 }
 

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { FaGoogle, FaTimes } from "react-icons/fa";
+import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import {
@@ -32,7 +33,7 @@ const emptySignup = {
   secretKey: "",
 };
 
-const LoginForm = ({ loginForm, setLoginForm, loginRole, setLoginRole, adminSecret, setAdminSecret, handleLogin }) => {
+const LoginForm = ({ loginForm, setLoginForm, loginRole, setLoginRole, adminSecret, setAdminSecret, handleLogin, handleGoogleLogin }) => {
   return (
     <form className="space-y-3" onSubmit={handleLogin}>
       <div className="grid grid-cols-2 gap-2">
@@ -77,14 +78,14 @@ const LoginForm = ({ loginForm, setLoginForm, loginRole, setLoginRole, adminSecr
         Login
       </button>
       <button type="button" className="w-full text-right text-xs text-slate-500">Forgot Password?</button>
-      <button type="button" className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-2.5 font-semibold">
+      <button type="button" onClick={handleGoogleLogin} className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-2.5 font-semibold hover:bg-slate-50">
         <FaGoogle /> Continue with Google
       </button>
     </form>
   );
 };
 
-const SignupForm = ({ signupForm, setSignupForm, handleSignup }) => {
+const SignupForm = ({ signupForm, setSignupForm, handleSignup, handleGoogleLogin }) => {
   const [stateOptions, setStateOptions] = useState([]);
   const [cityOptionsByState, setCityOptionsByState] = useState({});
   const districts = findStateRecord(signupForm.state)?.districts || [];
@@ -201,6 +202,9 @@ const SignupForm = ({ signupForm, setSignupForm, handleSignup }) => {
       <input className="w-full rounded-xl border border-slate-300 px-4 py-2.5" placeholder="Password" type="password" value={signupForm.password} onChange={(event) => setSignupForm((prev) => ({ ...prev, password: event.target.value }))} />
       <input className="w-full rounded-xl border border-slate-300 px-4 py-2.5" placeholder="Confirm Password" type="password" value={signupForm.confirmPassword} onChange={(event) => setSignupForm((prev) => ({ ...prev, confirmPassword: event.target.value }))} />
       <button type="submit" className="w-full rounded-xl bg-emerald-600 px-4 py-2.5 font-semibold text-white hover:bg-emerald-700">Create Account</button>
+      <button type="button" onClick={handleGoogleLogin} className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-2.5 font-semibold hover:bg-slate-50">
+        <FaGoogle /> Sign up with Google
+      </button>
     </form>
   );
 };
@@ -223,6 +227,7 @@ SignupForm.propTypes = {
   }).isRequired,
   setSignupForm: PropTypes.func.isRequired,
   handleSignup: PropTypes.func.isRequired,
+  handleGoogleLogin: PropTypes.func.isRequired,
 };
 
 const LoginModal = () => {
@@ -302,6 +307,37 @@ const LoginModal = () => {
     }
   };
 
+  const handleGoogleLoginSuccess = async (codeResponse) => {
+    try {
+      setError("");
+      const { access_token } = codeResponse;
+
+      // Fetch Google user info using the access token
+      const response = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+        headers: { Authorization: `Bearer ${access_token}` },
+      });
+
+      const googleUser = await response.json();
+
+      // Auto-login with Google credentials
+      login({
+        email: googleUser.email,
+        name: googleUser.name,
+        role: "citizen",
+      });
+
+      setAuthTab("login");
+      setTimeout(() => navigate("/"), 300);
+    } catch (err) {
+      setError("Google sign-in failed. Please try again.");
+    }
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: handleGoogleLoginSuccess,
+    onError: () => setError("Google sign-in failed. Please make sure Google Client ID is configured."),
+  });
+
   if (!authModalOpen) {
     return null;
   }
@@ -360,9 +396,10 @@ const LoginModal = () => {
               adminSecret={adminSecret}
               setAdminSecret={setAdminSecret}
               handleLogin={handleLogin}
+              handleGoogleLogin={googleLogin}
             />
           ) : (
-            <SignupForm signupForm={signupForm} setSignupForm={setSignupForm} handleSignup={handleSignup} />
+            <SignupForm signupForm={signupForm} setSignupForm={setSignupForm} handleSignup={handleSignup} handleGoogleLogin={googleLogin} />
           )}
         </div>
       </div>
